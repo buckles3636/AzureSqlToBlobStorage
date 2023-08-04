@@ -1,0 +1,50 @@
+#-----------------------------------------Enter Parameters-------------------------------------#
+# Subscription and Resource Group
+$subscriptionName = '<Name of Subscription Resources are in>'
+$resourceGroup = "<Resource Group Name>"
+
+#SQL Parameters
+$sqlServerName = "<Azure SQL Server Name>"
+$databaseName = "<Azure SQL Database Name>"
+$adminUser = "<Sql Server Azure Ad Admin Username>"
+$securePassword = "<Sql Server Azure Ad Admin Password>" | ConvertTo-SecureString -AsPlainText -Force
+
+#Storage Account Parameters
+$storageAccsessKey = "<Storage Container AccsessKey>"
+$storageUri = "<Storage Container Uri>"
+
+#----------------------------------------------------------------------------------------------#
+
+# Connect to azure MI
+Write-Output "Connecting to Azure Managed Identity..." 
+Connect-AzAccount -Identity 
+Write-Output "Successfully connected with Automation account's Managed Identity"
+
+# Selecting Subscription (Need to give automation accounts System Assigned Managaed Idenity accsess to resources bbeing accsessed within the subscription)
+Write-Output "Selecting subscription..."
+Get-AzContext -ListAvailable | Where{$_.Name -match $subscriptionName} | Set-AzContext 
+Write-Output "Subscription selected sucsessfully"
+
+#Create File Name
+Write-Output "Creating File..."
+$currentDate = Get-Date -Format "yyyy-MM-dd_hh:mmtt"
+$bacpacFile = "${databaseName}_${currentDate}.bacpac"
+Write-Output "File Created Succsesfully"
+
+#Export Parameters 
+$exportParameters = @{
+    AuthenticationType = "AdPassword"
+    ResourceGroupName = $resourceGroup
+    ServerName = $sqlServerName
+    DatabaseName = $databaseName
+    StorageKeyType = "StorageAccessKey"
+    StorageKey = $storageAccessKey
+	StorageUri = "${storageUri}${bacpacFile}"
+    AdministratorLogin = $adminUser
+    AdministratorLoginPassword = $securePassword
+}
+
+#Export 
+Write-Output "Starting Export..."
+New-AzSqlDatabaseExport @exportParameters
+Write-Output "Exported Started"
