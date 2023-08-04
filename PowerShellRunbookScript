@@ -10,7 +10,7 @@ $adminUser = "<Sql Server Azure Ad Admin Username>"
 $securePassword = "<Sql Server Azure Ad Admin Password>" | ConvertTo-SecureString -AsPlainText -Force
 
 #Storage Account Parameters
-$storageAccsessKey = "<Storage Container AccsessKey>"
+$storageAccessKey = "<Storage Container AccsessKey>"
 $storageUri = "<Storage Container Uri>"
 
 #----------------------------------------------------------------------------------------------#
